@@ -170,8 +170,9 @@ pytest -v
 
 ### 5. Launch the Dashboard
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
+*(Or simply `streamlit run app.py`)*
 Open your browser at `http://localhost:8501`.
 
 ---

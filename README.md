@@ -141,7 +141,7 @@ cyberpulse/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/cyberpulse.git
+git clone https://github.com/harishkarthick28/CyberPulse.git
 cd cyberpulse
 ```
 
@@ -219,7 +219,7 @@ git commit -m "feat: CyberPulse production-ready early-warning SOC dashboard"
 git branch -M main
 
 # 5. Link to your GitHub repo
-git remote add origin https://github.com/YOUR_USERNAME/cyberpulse.git
+git remote add origin https://github.com/harishkarthick28/CyberPulse.git
 
 # 6. Push code to GitHub
 git push -u origin main

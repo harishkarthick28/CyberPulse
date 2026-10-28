@@ -9,6 +9,6 @@ venv/
 .venv/
 env/
 .env
-.streamlit/
+.streamlit/secrets.toml
 *.log
 .DS_Store
